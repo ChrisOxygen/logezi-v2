@@ -6,9 +6,15 @@ import { HOSCounter } from '@/features/log/HOSCounter'
 export function MapScreen() {
   const navigate = useNavigate()
   const trip = useTripStore((s) => s.trip)!
+  const endTrip = useTripStore((s) => s.endTrip)
 
   const completedDays = trip.days.filter((d) => d.completed).length
   const totalMiles = Math.round(trip.route.total_miles)
+
+  const handleEndTrip = () => {
+    endTrip()
+    navigate('/end-trip')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,7 +45,7 @@ export function MapScreen() {
             Go to Day {trip.current_day} Log Sheet
           </button>
           <button
-            onClick={() => navigate('/end-trip')}
+            onClick={handleEndTrip}
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
             End Trip &amp; Generate PDF

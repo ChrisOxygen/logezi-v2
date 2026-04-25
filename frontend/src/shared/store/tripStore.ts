@@ -2,6 +2,14 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ActiveTrip, DayLog, LogEntry, PostTrip } from '@/shared/types'
 
+const INITIAL_ENTRY: LogEntry = {
+  time: '00:00',
+  status: 'OFF_DUTY',
+  location: '',
+  remarks: '',
+  bracket: false,
+}
+
 const emptyDay = (day_number: number, date: string): DayLog => ({
   day_number,
   date,
@@ -15,13 +23,14 @@ const emptyDay = (day_number: number, date: string): DayLog => ({
   commodity: '',
   load_number: '',
   total_miles: 0,
-  entries: [],
+  entries: [{ ...INITIAL_ENTRY }],
   post_trip: { defects: 'none' },
   completed: false,
 })
 
 interface TripStore {
   trip: ActiveTrip | null
+  endedTrip: ActiveTrip | null
 
   // Lifecycle
   startTrip: (trip: ActiveTrip) => void
@@ -46,12 +55,18 @@ export const useTripStore = create<TripStore>()(
   persist(
     (set, get) => ({
       trip: null,
+      endedTrip: null,
 
-      startTrip: (trip) => set({ trip }),
+      startTrip: (trip) => set({ trip, endedTrip: null }),
 
-      endTrip: () => set({ trip: null }),
+      // Moves active trip to endedTrip — EndTripScreen reads from endedTrip
+      endTrip: () => {
+        const { trip } = get()
+        set({ trip: null, endedTrip: trip })
+      },
 
-      abandonTrip: () => set({ trip: null }),
+      // Clears everything — used by "Abandon" and "Start New" on EndTripScreen
+      abandonTrip: () => set({ trip: null, endedTrip: null }),
 
       addDay: () => {
         const { trip } = get()
@@ -97,6 +112,8 @@ export const useTripStore = create<TripStore>()(
       },
 
       removeEntry: (index) => {
+        // Index 0 is the auto-generated 00:00 OFF_DUTY anchor — never remove it
+        if (index === 0) return
         const { trip } = get()
         if (!trip) return
         set({

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { LogEntry, DutyStatus } from '@/shared/types'
 import { DUTY_STATUS_LABELS } from '@/shared/types'
+import { LocationAutocomplete } from '@/shared/components/LocationAutocomplete'
 
 const VALID_MINUTES = new Set(['00', '15', '30', '45'])
 
@@ -39,10 +40,6 @@ export function LogEntryForm({ onAdd, loading }: Props) {
     setTimeError(null)
   }
 
-  const field = (key: keyof LogEntry) =>
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm((f) => ({ ...f, [key]: e.target.value }))
-
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
@@ -52,7 +49,7 @@ export function LogEntryForm({ onAdd, loading }: Props) {
             type="text"
             placeholder="06:30"
             value={form.time}
-            onChange={(e) => { field('time')(e); setTimeError(null) }}
+            onChange={(e) => { setForm((f) => ({ ...f, time: e.target.value })); setTimeError(null) }}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {timeError && <p className="text-red-500 text-xs mt-1">{timeError}</p>}
@@ -72,16 +69,13 @@ export function LogEntryForm({ onAdd, loading }: Props) {
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Location (City, State)</label>
-        <input
-          type="text"
-          placeholder="e.g. Green Bay, WI"
-          value={form.location}
-          onChange={field('location')}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      <LocationAutocomplete
+        label="Location (City, State)"
+        placeholder="e.g. Green Bay, WI"
+        value={form.location}
+        onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+        labelClassName="text-xs text-gray-500"
+      />
 
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1">Remarks</label>
@@ -89,7 +83,7 @@ export function LogEntryForm({ onAdd, loading }: Props) {
           type="text"
           placeholder="e.g. Pre-trip inspection, Fuel stop..."
           value={form.remarks}
-          onChange={field('remarks')}
+          onChange={(e) => setForm((f) => ({ ...f, remarks: e.target.value }))}
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

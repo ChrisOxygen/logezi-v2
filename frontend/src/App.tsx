@@ -6,9 +6,15 @@ import { MapScreen } from '@/features/map/MapScreen'
 import { LogScreen } from '@/features/log/LogScreen'
 import { EndTripScreen } from '@/features/end-trip/EndTripScreen'
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ActiveTripRoute({ children }: { children: React.ReactNode }) {
   const trip = useTripStore((s) => s.trip)
   if (!trip) return <Navigate to="/" replace />
+  return <>{children}</>
+}
+
+function EndedTripRoute({ children }: { children: React.ReactNode }) {
+  const endedTrip = useTripStore((s) => s.endedTrip)
+  if (!endedTrip) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -21,25 +27,25 @@ export default function App() {
         <Route
           path="/map"
           element={
-            <ProtectedRoute>
+            <ActiveTripRoute>
               <MapScreen />
-            </ProtectedRoute>
+            </ActiveTripRoute>
           }
         />
         <Route
           path="/log"
           element={
-            <ProtectedRoute>
+            <ActiveTripRoute>
               <LogScreen />
-            </ProtectedRoute>
+            </ActiveTripRoute>
           }
         />
         <Route
           path="/end-trip"
           element={
-            <ProtectedRoute>
+            <EndedTripRoute>
               <EndTripScreen />
-            </ProtectedRoute>
+            </EndedTripRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />

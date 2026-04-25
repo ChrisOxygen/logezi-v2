@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTripStore } from '@/shared/store/tripStore'
 import { getRoute, isApiError } from '@/shared/api/client'
+import { LocationAutocomplete } from '@/shared/components/LocationAutocomplete'
 import type { ActiveTrip } from '@/shared/types'
 
 interface Form {
@@ -79,8 +80,8 @@ export function HomeScreen() {
     }
   }
 
-  const set = (key: keyof Form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+  const setField = (key: keyof Form) => (value: string) =>
+    setForm((f) => ({ ...f, [key]: value }))
 
   // ── Active trip ────────────────────────────────────────────────────────────
   if (trip) {
@@ -141,27 +142,27 @@ export function HomeScreen() {
         )}
 
         <div className="flex flex-col gap-4">
-          {(
-            [
-              { key: 'current_location', label: 'Current Location', placeholder: 'e.g. Dallas, TX' },
-              { key: 'pickup', label: 'Pickup Location', placeholder: 'e.g. Shreveport, LA' },
-              { key: 'destination', label: 'Destination', placeholder: 'e.g. Atlanta, GA' },
-            ] as const
-          ).map(({ key, label, placeholder }) => (
-            <div key={key}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-              <input
-                type="text"
-                placeholder={placeholder}
-                value={form[key]}
-                onChange={set(key)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {fieldErrors[key] && (
-                <p className="text-red-500 text-xs mt-1">{fieldErrors[key]}</p>
-              )}
-            </div>
-          ))}
+          <LocationAutocomplete
+            label="Current Location"
+            placeholder="e.g. Dallas, TX"
+            value={form.current_location}
+            onChange={setField('current_location')}
+            error={fieldErrors['current_location']}
+          />
+          <LocationAutocomplete
+            label="Pickup Location"
+            placeholder="e.g. Shreveport, LA"
+            value={form.pickup}
+            onChange={setField('pickup')}
+            error={fieldErrors['pickup']}
+          />
+          <LocationAutocomplete
+            label="Destination"
+            placeholder="e.g. Atlanta, GA"
+            value={form.destination}
+            onChange={setField('destination')}
+            error={fieldErrors['destination']}
+          />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -174,7 +175,7 @@ export function HomeScreen() {
               step={0.5}
               placeholder="e.g. 42.5"
               value={form.cycle_hours_used}
-              onChange={set('cycle_hours_used')}
+              onChange={(e) => setField('cycle_hours_used')(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {fieldErrors['cycle_hours_used'] && (

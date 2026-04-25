@@ -22,7 +22,7 @@ const DAY_FIELDS = [
 
 export function LogScreen() {
   const navigate = useNavigate()
-  const { trip, addEntry, removeEntry, updateDayHeader, updatePostTrip, completeCurrentDay, addDay } =
+  const { trip, addEntry, removeEntry, updateDayHeader, updatePostTrip, completeCurrentDay, addDay, endTrip } =
     useTripStore()
   const currentDay = useTripStore((s) => s.currentDay())!
 
@@ -183,7 +183,7 @@ export function LogScreen() {
             Save Day {currentDay.day_number} &amp; Add Day {currentDay.day_number + 1}
           </button>
           <button
-            onClick={() => navigate('/end-trip')}
+            onClick={() => { endTrip(); navigate('/end-trip') }}
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
             End Trip &amp; Generate PDF
