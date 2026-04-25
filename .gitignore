@@ -1,11 +1,19 @@
+# Docs
+backend/HOS_LOGGER_BACKEND.md
+
 # Python / Django
 backend/venv/
 backend/.env
 backend/__pycache__/
 backend/**/__pycache__/
 backend/*.pyc
+backend/*.log
 backend/db.sqlite3
 backend/staticfiles/
+
+# Claude Code
+.claude/
+backend/.claude/
 
 # Node / React
 frontend/node_modules/

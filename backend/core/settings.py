@@ -41,8 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-'corsheaders',
-'trip',
+    'corsheaders',
+    'maps',
+    'trips',
+    'logs',
 ]
 
 MIDDLEWARE = [
@@ -90,10 +92,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # All calculation happens in memory per request
 
 # CORS — allow your React app to call the API
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",    # Vite dev server
-    "https://your-app.vercel.app",  # update after deploy
-]
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:5173',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
 
 # DRF config
 REST_FRAMEWORK = {
@@ -103,6 +106,56 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+}
+
+# External API config
+NOMINATIM_USER_AGENT = config('NOMINATIM_USER_AGENT', default='hos_logger_app/1.0')
+NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org'
+OSRM_BASE_URL = 'https://router.project-osrm.org'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} — {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'hos_logger.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
+        'core': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'maps': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'trips': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'logs': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
 }
 
 
@@ -145,6 +198,10 @@ USE_TZ = True
 # Static files (Vercel + WhiteNoise)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
