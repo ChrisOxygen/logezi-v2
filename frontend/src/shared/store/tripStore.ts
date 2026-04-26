@@ -75,11 +75,23 @@ export const useTripStore = create<TripStore>()(
         const prevDay = trip.days.find((d) => d.day_number === trip.current_day)
         const prevEntries = prevDay?.entries ?? []
         const lastLocation = prevEntries.length > 0 ? prevEntries[prevEntries.length - 1].location : ''
+        const newDay = emptyDay(nextNum, date.toISOString().split('T')[0], lastLocation)
+        if (prevDay) {
+          newDay.driver_name = prevDay.driver_name
+          newDay.driver_number = prevDay.driver_number
+          newDay.co_driver = prevDay.co_driver
+          newDay.home_terminal = prevDay.home_terminal
+          newDay.tractor = prevDay.tractor
+          newDay.trailer = prevDay.trailer
+          newDay.shipper = prevDay.shipper
+          newDay.commodity = prevDay.commodity
+          newDay.load_number = prevDay.load_number
+        }
         set({
           trip: {
             ...trip,
             current_day: nextNum,
-            days: [...trip.days, emptyDay(nextNum, date.toISOString().split('T')[0], lastLocation)],
+            days: [...trip.days, newDay],
           },
         })
       },
