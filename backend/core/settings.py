@@ -91,12 +91,16 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # No database needed — stateless MVP
 # All calculation happens in memory per request
 
-# CORS — allow your React app to call the API
+# CORS — allow local dev and any *.vercel.app subdomain
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default='http://localhost:5173',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://.*\.vercel\.app$',
+]
 
 # DRF config
 REST_FRAMEWORK = {
