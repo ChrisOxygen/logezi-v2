@@ -89,44 +89,58 @@ export function HomeScreen() {
   const setField = (key: keyof Form) => (value: string) =>
     setForm((f) => ({ ...f, [key]: value }))
 
-  // ── Active trip ────────────────────────────────────────────────────────────
+  // ── Active trip ─────────────────────────────────────────────────────────────
   if (trip) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Active Trip Found</h2>
-          <p className="text-gray-500 mb-1">
-            {trip.setup.pickup} → {trip.setup.destination}
-          </p>
-          <p className="text-sm text-gray-400 mb-6">
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ background: 'var(--col-bg)' }}
+      >
+        <div className="card p-7 w-full max-w-md anim-fade-up">
+          {/* accent stripe */}
+          <div
+            className="h-1 rounded-full mb-6"
+            style={{ background: 'var(--col-amber)', width: '48px' }}
+          />
+
+          <span className="section-label">Active Trip</span>
+          <h2
+            className="font-display font-bold mt-1 mb-1"
+            style={{ fontSize: '1.5rem', color: 'var(--col-text)' }}
+          >
+            {trip.setup.pickup}
+            <span style={{ color: 'var(--col-text-3)', fontWeight: 600 }}> → </span>
+            {trip.setup.destination}
+          </h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--col-text-3)' }}>
             Day {trip.current_day} &bull;{' '}
             {trip.days.filter((d) => d.completed).length} day(s) completed
           </p>
 
           <div className="flex flex-col gap-3">
-            <button
-              onClick={() => navigate('/map')}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
+            <button className="btn btn-amber" onClick={() => navigate('/map')}>
               Resume Trip
             </button>
-            <button
-              onClick={() => navigate('/log')}
-              className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-            >
-              Go to Day {trip.current_day} Log
+            <button className="btn btn-navy" onClick={() => navigate('/log')}>
+              Day {trip.current_day} Log Sheet
             </button>
-            <button
-              onClick={() => navigate('/end-trip')}
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-            >
+            <button className="btn btn-green" onClick={() => navigate('/end-trip')}>
               End Trip
             </button>
             <button
               onClick={abandonTrip}
-              className="w-full text-red-500 py-2 text-sm hover:underline"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--col-red)',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                padding: '0.4rem 0',
+                textAlign: 'center',
+              }}
             >
-              Abandon Trip &amp; Start New
+              Abandon &amp; Start New Trip
             </button>
           </div>
         </div>
@@ -134,69 +148,110 @@ export function HomeScreen() {
     )
   }
 
-  // ── Start form ─────────────────────────────────────────────────────────────
+  // ── Start form ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">HOS Logger</h1>
-        <p className="text-gray-500 mb-6 text-sm">Driver's daily log sheet generator</p>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'var(--col-bg)' }}
+    >
+      <div className="w-full max-w-md">
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-4">
-          <LocationAutocomplete
-            label="Current Location"
-            placeholder="e.g. Dallas, TX"
-            value={form.current_location}
-            onChange={setField('current_location')}
-            error={fieldErrors['current_location']}
-          />
-          <LocationAutocomplete
-            label="Pickup Location"
-            placeholder="e.g. Shreveport, LA"
-            value={form.pickup}
-            onChange={setField('pickup')}
-            error={fieldErrors['pickup']}
-          />
-          <LocationAutocomplete
-            label="Destination"
-            placeholder="e.g. Atlanta, GA"
-            value={form.destination}
-            onChange={setField('destination')}
-            error={fieldErrors['destination']}
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Cycle Hours Used (0–70)
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={70}
-              step={0.5}
-              placeholder="e.g. 42.5"
-              value={form.cycle_hours_used}
-              onChange={(e) => setField('cycle_hours_used')(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {fieldErrors['cycle_hours_used'] && (
-              <p className="text-red-500 text-xs mt-1">{fieldErrors['cycle_hours_used']}</p>
-            )}
-          </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2"
+        {/* Hero heading — outside card */}
+        <div className="text-center mb-7 anim-fade-up">
+          <h1
+            className="font-display font-extrabold tracking-tight"
+            style={{ fontSize: '2.6rem', color: 'var(--col-navy)', lineHeight: 1.05 }}
           >
-            {loading ? 'Getting Route...' : 'Start Trip'}
-          </button>
+            Driver's Daily
+            <br />
+            <span style={{ color: 'var(--col-amber)' }}>HOS Log</span>
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: 'var(--col-text-2)' }}>
+            FMCSA-compliant log sheet generator — 70 hr / 8-day cycle
+          </p>
         </div>
+
+        <div className="card p-7 anim-fade-up delay-1">
+          <span className="section-label">New Trip Setup</span>
+
+          {error && (
+            <div className="alert alert-error mt-4">
+              <span>⚠</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4 mt-4">
+            <div className="anim-fade-up delay-2">
+              <LocationAutocomplete
+                label="Current Location"
+                placeholder="e.g. Dallas, TX"
+                value={form.current_location}
+                onChange={setField('current_location')}
+                error={fieldErrors['current_location']}
+              />
+            </div>
+
+            <div className="anim-fade-up delay-3">
+              <LocationAutocomplete
+                label="Pickup Location"
+                placeholder="e.g. Shreveport, LA"
+                value={form.pickup}
+                onChange={setField('pickup')}
+                error={fieldErrors['pickup']}
+              />
+            </div>
+
+            <div className="anim-fade-up delay-4">
+              <LocationAutocomplete
+                label="Destination"
+                placeholder="e.g. Atlanta, GA"
+                value={form.destination}
+                onChange={setField('destination')}
+                error={fieldErrors['destination']}
+              />
+            </div>
+
+            <div className="anim-fade-up delay-5">
+              <label className="field-label">Cycle Hours Used (0–70)</label>
+              <input
+                type="number"
+                min={0}
+                max={70}
+                step={0.5}
+                placeholder="e.g. 42.5"
+                value={form.cycle_hours_used}
+                onChange={(e) => setField('cycle_hours_used')(e.target.value)}
+                className="field"
+              />
+              {fieldErrors['cycle_hours_used'] && (
+                <p className="text-xs mt-1" style={{ color: 'var(--col-red)' }}>
+                  {fieldErrors['cycle_hours_used']}
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="btn btn-amber mt-1 anim-fade-up delay-5"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                  </svg>
+                  Getting Route…
+                </>
+              ) : 'Start Trip'}
+            </button>
+          </div>
+        </div>
+
+        {/* Compliance footnote */}
+        <p className="text-center mt-5 text-xs anim-fade-up delay-5" style={{ color: 'var(--col-text-3)' }}>
+          Property carrier · 11-hr driving / 14-hr window · 30-min break rule
+        </p>
       </div>
     </div>
   )

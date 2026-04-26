@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { LogEntry, DutyStatus } from '@/shared/types'
-import { DUTY_STATUS_LABELS } from '@/shared/types'
+import { DUTY_STATUS_LABELS, DUTY_STATUS_COLORS } from '@/shared/types'
 import { LocationAutocomplete } from '@/shared/components/LocationAutocomplete'
 
 const VALID_MINUTES = new Set(['00', '15', '30', '45'])
@@ -40,32 +40,45 @@ export function LogEntryForm({ onAdd, loading }: Props) {
     setTimeError(null)
   }
 
+  const statusColor = DUTY_STATUS_COLORS[form.status]
+
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Time (HH:MM)</label>
+          <label className="field-label">Time (HH:MM)</label>
           <input
             type="text"
             placeholder="06:30"
             value={form.time}
             onChange={(e) => { setForm((f) => ({ ...f, time: e.target.value })); setTimeError(null) }}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field"
+            style={{ fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em' }}
           />
-          {timeError && <p className="text-red-500 text-xs mt-1">{timeError}</p>}
+          {timeError && (
+            <p className="text-xs mt-1" style={{ color: 'var(--col-red)' }}>{timeError}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Duty Status</label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as DutyStatus }))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {Object.entries(DUTY_STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
+          <label className="field-label">Duty Status</label>
+          {/* Status selector with color preview strip */}
+          <div className="relative">
+            <div
+              className="absolute left-0 top-0 bottom-0 w-1 rounded-l-md"
+              style={{ background: statusColor }}
+            />
+            <select
+              value={form.status}
+              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as DutyStatus }))}
+              className="field"
+              style={{ paddingLeft: '1.1rem' }}
+            >
+              {Object.entries(DUTY_STATUS_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -74,26 +87,28 @@ export function LogEntryForm({ onAdd, loading }: Props) {
         placeholder="e.g. Green Bay, WI"
         value={form.location}
         onChange={(v) => setForm((f) => ({ ...f, location: v }))}
-        labelClassName="text-xs text-gray-500"
       />
 
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Remarks</label>
+        <label className="field-label">Remarks</label>
         <input
           type="text"
-          placeholder="e.g. Pre-trip inspection, Fuel stop..."
+          placeholder="e.g. Pre-trip inspection, Fuel stop…"
           value={form.remarks}
           onChange={(e) => setForm((f) => ({ ...f, remarks: e.target.value }))}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field"
         />
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+      <label
+        className="flex items-center gap-2.5 cursor-pointer select-none text-sm"
+        style={{ color: 'var(--col-text-2)' }}
+      >
         <input
           type="checkbox"
           checked={form.bracket}
           onChange={(e) => setForm((f) => ({ ...f, bracket: e.target.checked }))}
-          className="rounded"
+          style={{ accentColor: 'var(--col-amber)', width: '15px', height: '15px' }}
         />
         Truck did not move during this period (bracket)
       </label>
@@ -101,9 +116,17 @@ export function LogEntryForm({ onAdd, loading }: Props) {
       <button
         onClick={handleSubmit}
         disabled={loading || !form.time || !form.location}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="btn btn-amber"
+        style={{ fontSize: '0.9rem' }}
       >
-        {loading ? 'Validating...' : '+ Add Entry'}
+        {loading ? (
+          <>
+            <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+            Validating…
+          </>
+        ) : '+ Add Entry'}
       </button>
     </div>
   )

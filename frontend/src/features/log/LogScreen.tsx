@@ -9,15 +9,15 @@ import { LogGrid } from './LogGrid'
 import { HOSCounter } from './HOSCounter'
 
 const DAY_FIELDS = [
-  { key: 'driver_name', label: 'Driver Name' },
+  { key: 'driver_name',   label: 'Driver Name' },
   { key: 'driver_number', label: 'Driver Number' },
-  { key: 'tractor', label: 'Tractor No.' },
-  { key: 'trailer', label: 'Trailer No.' },
-  { key: 'shipper', label: 'Shipper', wide: true },
-  { key: 'commodity', label: 'Commodity' },
-  { key: 'load_number', label: 'Load Number' },
-  { key: 'home_terminal', label: 'Home Terminal', wide: true },
-  { key: 'co_driver', label: 'Co-Driver (or N/A)' },
+  { key: 'tractor',       label: 'Tractor No.' },
+  { key: 'trailer',       label: 'Trailer No.' },
+  { key: 'shipper',       label: 'Shipper',           wide: true },
+  { key: 'commodity',     label: 'Commodity' },
+  { key: 'load_number',   label: 'Load Number' },
+  { key: 'home_terminal', label: 'Home Terminal',     wide: true },
+  { key: 'co_driver',     label: 'Co-Driver (or N/A)' },
 ] as const
 
 export function LogScreen() {
@@ -57,138 +57,167 @@ export function LogScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="max-w-3xl mx-auto p-4 flex flex-col gap-6">
+    <div className="min-h-screen pb-16" style={{ background: 'var(--col-bg)' }}>
+      <div className="max-w-3xl mx-auto p-4 flex flex-col gap-5">
 
         {/* Day header fields */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            Day {currentDay.day_number} — {currentDay.date}
-          </h2>
+        <div className="card p-6 anim-fade-up">
+          <div className="flex items-baseline gap-3 mb-5">
+            <h2
+              className="font-display font-bold"
+              style={{ fontSize: '1.5rem', color: 'var(--col-text)' }}
+            >
+              Day {currentDay.day_number}
+            </h2>
+            <span
+              className="font-mono text-sm"
+              style={{ color: 'var(--col-text-3)', fontFamily: 'JetBrains Mono, monospace' }}
+            >
+              {currentDay.date}
+            </span>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             {DAY_FIELDS.map(({ key, label, ...rest }) => (
               <div key={key} className={'wide' in rest && rest.wide ? 'col-span-2' : ''}>
-                <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+                <label className="field-label">{label}</label>
                 <input
                   type="text"
                   value={currentDay[key] as string}
                   onChange={(e) => updateDayHeader({ [key]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="field"
                 />
               </div>
             ))}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Total Miles Today</label>
+              <label className="field-label">Total Miles Today</label>
               <input
                 type="number"
                 min={0}
                 value={currentDay.total_miles}
                 onChange={(e) => updateDayHeader({ total_miles: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="field"
               />
             </div>
           </div>
         </div>
 
-        {/* Canvas grid */}
-        <div className="bg-white rounded-xl shadow p-4 overflow-x-auto">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">24-Hour Log Grid</h3>
-          <LogGrid entries={currentDay.entries} />
+        {/* 24-hour canvas grid */}
+        <div className="card p-5 overflow-x-auto anim-fade-up delay-1">
+          <span className="section-label">24-Hour Log Grid</span>
+          <div className="mt-3">
+            <LogGrid entries={currentDay.entries} />
+          </div>
         </div>
 
-        <HOSCounter />
+        {/* HOS gauge */}
+        <div className="anim-fade-up delay-2">
+          <HOSCounter />
+        </div>
 
         {/* Validation messages */}
         {apiError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
-            {apiError}
+          <div className="alert alert-error anim-slide-down">
+            <span>⚠</span>
+            <span>{apiError}</span>
           </div>
         )}
         {validation && (
           <div className="flex flex-col gap-2">
             {validation.errors.map((e, i) => (
-              <div key={i} className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
-                ⛔ {e}
+              <div key={i} className="alert alert-error anim-slide-down">
+                <span>⛔</span><span>{e}</span>
               </div>
             ))}
             {validation.warnings.map((w, i) => (
-              <div key={i} className="bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg p-3 text-sm">
-                ⚠️ {w}
+              <div key={i} className="alert alert-warning anim-slide-down">
+                <span>⚠️</span><span>{w}</span>
               </div>
             ))}
             {validation.fuel_reminder && (
-              <div className="bg-orange-50 border border-orange-200 text-orange-700 rounded-lg p-3 text-sm">
-                ⛽ Fuel reminder: log a fuel stop in remarks.
+              <div className="alert alert-fuel anim-slide-down">
+                <span>⛽</span><span>Fuel reminder: log a fuel stop in remarks.</span>
               </div>
             )}
           </div>
         )}
 
-        {/* Add entry */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Add Log Entry</h3>
-          <LogEntryForm onAdd={handleAddEntry} loading={validating} />
+        {/* Add entry form */}
+        <div className="card p-6 anim-fade-up delay-3">
+          <span className="section-label">Add Log Entry</span>
+          <div className="mt-4">
+            <LogEntryForm onAdd={handleAddEntry} loading={validating} />
+          </div>
         </div>
 
         {/* Entry list */}
         {currentDay.entries.length > 0 && (
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">
-              Today's Entries ({currentDay.entries.length})
-            </h3>
+          <div className="card p-6 anim-fade-up delay-4">
+            <div className="flex items-center justify-between mb-4">
+              <span className="section-label">Today's Entries</span>
+              <span
+                className="font-display font-bold text-sm"
+                style={{ color: 'var(--col-text-3)' }}
+              >
+                {currentDay.entries.length}
+              </span>
+            </div>
             <LogEntryList entries={currentDay.entries} onRemove={removeEntry} />
           </div>
         )}
 
         {/* Post-trip inspection */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Post-Trip Inspection</h3>
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
+        <div className="card p-6 anim-fade-up delay-5">
+          <span className="section-label">Post-Trip Inspection</span>
+          <div className="flex flex-col gap-2.5 mt-3">
+            <label
+              className="flex items-center gap-3 cursor-pointer text-sm"
+              style={{ color: 'var(--col-text)' }}
+            >
               <input
                 type="radio"
                 name="defects"
                 checked={currentDay.post_trip.defects === 'none'}
                 onChange={() => updatePostTrip({ defects: 'none' })}
+                style={{ accentColor: 'var(--col-amber)' }}
               />
-              <span className="text-sm">No defects found</span>
+              No defects found
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label
+              className="flex items-center gap-3 cursor-pointer text-sm"
+              style={{ color: 'var(--col-text)' }}
+            >
               <input
                 type="radio"
                 name="defects"
                 checked={currentDay.post_trip.defects !== 'none'}
                 onChange={() => updatePostTrip({ defects: '' })}
+                style={{ accentColor: 'var(--col-amber)' }}
               />
-              <span className="text-sm">Defects found — describe:</span>
+              Defects found — describe:
             </label>
             {currentDay.post_trip.defects !== 'none' && (
               <textarea
                 rows={3}
                 value={currentDay.post_trip.defects}
                 onChange={(e) => updatePostTrip({ defects: e.target.value })}
-                placeholder="Describe the defects..."
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describe the defects…"
+                className="field"
               />
             )}
           </div>
         </div>
 
         {/* Day actions */}
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={handleSaveDay}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
+        <div className="flex flex-col gap-3 anim-fade-up delay-5">
+          <button className="btn btn-navy" onClick={handleSaveDay}>
             Save Day {currentDay.day_number} &amp; Add Day {currentDay.day_number + 1}
           </button>
-          <button
-            onClick={() => endTrip()}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-          >
+          <button className="btn btn-green" onClick={() => endTrip()}>
             End Trip &amp; Generate PDF
           </button>
         </div>
+
       </div>
     </div>
   )

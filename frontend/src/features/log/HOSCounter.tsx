@@ -8,35 +8,84 @@ export function HOSCounter() {
   if (!trip || !currentDay) return null
 
   const drivingToday = hoursInStatus(currentDay.entries, 'DRIVING')
-  const onDutyToday =
-    drivingToday + hoursInStatus(currentDay.entries, 'ON_DUTY')
+  const onDutyToday  = drivingToday + hoursInStatus(currentDay.entries, 'ON_DUTY')
+  const totalCycle   = Math.min(trip.setup.cycle_hours_used + onDutyToday, 70)
+  const remaining    = Math.max(70 - totalCycle, 0)
+  const pct          = Math.min((totalCycle / 70) * 100, 100)
 
-  const totalCycle = Math.min(trip.setup.cycle_hours_used + onDutyToday, 70)
-  const remaining = Math.max(70 - totalCycle, 0)
-  const pct = (totalCycle / 70) * 100
+  const fillColor =
+    remaining < 10 ? 'var(--col-red)'
+    : remaining < 20 ? '#d97706'
+    : 'var(--col-green)'
 
-  const barColor =
-    remaining < 10
-      ? 'bg-red-500'
-      : remaining < 20
-        ? 'bg-yellow-500'
-        : 'bg-green-500'
+  const statusLabel =
+    remaining < 10 ? 'Critical'
+    : remaining < 20 ? 'Low'
+    : 'Available'
+
+  const statusBg =
+    remaining < 10 ? 'var(--col-red-pale)'
+    : remaining < 20 ? 'var(--col-amber-pale)'
+    : 'var(--col-green-pale)'
+
+  const statusTextColor =
+    remaining < 10 ? 'var(--col-red)'
+    : remaining < 20 ? 'var(--col-amber-dim)'
+    : 'var(--col-green)'
 
   return (
-    <div className="bg-white rounded-xl shadow p-4">
-      <div className="flex justify-between text-sm mb-2">
-        <span className="font-medium text-gray-700">70 hr / 8-Day Cycle</span>
-        <span className="text-gray-500">{remaining.toFixed(1)} hrs remaining</span>
+    <div className="card p-5 anim-fade-up">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <span className="section-label">70 hr / 8-Day Cycle</span>
+          <div
+            className="font-display font-bold mt-0.5"
+            style={{ fontSize: '1.6rem', color: 'var(--col-text)', lineHeight: 1 }}
+          >
+            {remaining.toFixed(1)}
+            <span className="text-sm font-sans font-normal ml-1" style={{ color: 'var(--col-text-3)' }}>
+              hrs left
+            </span>
+          </div>
+        </div>
+        <span
+          className="badge"
+          style={{ background: statusBg, color: statusTextColor }}
+        >
+          {statusLabel}
+        </span>
       </div>
-      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+
+      {/* Gauge bar */}
+      <div className="hos-gauge-track">
         <div
-          className={`h-full rounded-full transition-all ${barColor}`}
-          style={{ width: `${Math.min(pct, 100)}%` }}
+          className="hos-gauge-fill anim-bar-grow"
+          style={{ width: `${pct}%`, background: fillColor }}
         />
       </div>
-      <div className="flex justify-between text-xs text-gray-400 mt-1">
-        <span>{totalCycle.toFixed(1)} / 70 hrs used</span>
-        <span>Today: {drivingToday.toFixed(1)} driving / {onDutyToday.toFixed(1)} on-duty</span>
+
+      {/* Detail row */}
+      <div className="flex justify-between mt-2.5">
+        <span className="text-xs" style={{ color: 'var(--col-text-3)', fontFamily: 'JetBrains Mono, monospace' }}>
+          {totalCycle.toFixed(1)} / 70 used
+        </span>
+        <span className="text-xs" style={{ color: 'var(--col-text-3)', fontFamily: 'JetBrains Mono, monospace' }}>
+          Today: {drivingToday.toFixed(1)} driving · {onDutyToday.toFixed(1)} on-duty
+        </span>
+      </div>
+
+      {/* Tick marks */}
+      <div className="flex justify-between mt-1.5 px-0.5">
+        {[0, 10, 20, 30, 40, 50, 60, 70].map((h) => (
+          <span
+            key={h}
+            className="text-xs"
+            style={{ color: 'var(--col-border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem' }}
+          >
+            {h}
+          </span>
+        ))}
       </div>
     </div>
   )

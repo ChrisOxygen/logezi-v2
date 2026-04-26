@@ -12,45 +12,77 @@ export function LogEntryList({ entries, onRemove }: Props) {
     .sort((a, b) => a.entry.time.localeCompare(b.entry.time))
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       {sorted.map(({ entry, originalIndex }) => {
         const isAnchor = originalIndex === 0
+        const color = DUTY_STATUS_COLORS[entry.status]
 
         return (
-          <div
-            key={originalIndex}
-            className="flex items-start justify-between gap-3 py-2 border-b border-gray-100 last:border-0"
-          >
-            <div className="flex items-start gap-3 min-w-0">
-              <span className="text-sm font-mono font-semibold text-gray-800 shrink-0">
+          <div key={originalIndex} className="entry-row">
+            {/* Left: colored status stripe + time */}
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              {/* Status color bar */}
+              <div
+                className="shrink-0 w-0.5 self-stretch rounded-full mt-0.5"
+                style={{ background: color, minHeight: '36px' }}
+              />
+
+              {/* Time */}
+              <span
+                className="shrink-0 text-sm font-semibold pt-0.5"
+                style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  color: 'var(--col-text)',
+                  minWidth: '3.2rem',
+                }}
+              >
                 {entry.time}
               </span>
-              <div className="min-w-0">
+
+              {/* Details */}
+              <div className="min-w-0 flex-1">
                 <span
-                  className="inline-block text-xs font-medium px-2 py-0.5 rounded-full text-white mb-1"
-                  style={{ backgroundColor: DUTY_STATUS_COLORS[entry.status] }}
+                  className="badge"
+                  style={{
+                    background: color + '18',
+                    color,
+                    marginBottom: '3px',
+                    display: 'inline-flex',
+                  }}
                 >
                   {DUTY_STATUS_LABELS[entry.status]}
                 </span>
+
                 {entry.location && (
-                  <p className="text-xs text-gray-600 truncate">{entry.location}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--col-text-2)' }}>
+                    {entry.location}
+                  </p>
                 )}
                 {entry.remarks && (
-                  <p className="text-xs text-gray-400 truncate">{entry.remarks}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--col-text-3)' }}>
+                    {entry.remarks}
+                  </p>
                 )}
-                {entry.bracket && (
-                  <p className="text-xs text-blue-500">[bracket]</p>
-                )}
-                {isAnchor && (
-                  <p className="text-xs text-gray-300 italic">auto-generated start</p>
-                )}
+                <div className="flex gap-2 mt-0.5">
+                  {entry.bracket && (
+                    <span className="text-xs" style={{ color: 'var(--col-amber)', fontWeight: 600 }}>
+                      [bracket]
+                    </span>
+                  )}
+                  {isAnchor && (
+                    <span className="text-xs italic" style={{ color: 'var(--col-text-3)' }}>
+                      start of day
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
+            {/* Remove button */}
             {!isAnchor && (
               <button
                 onClick={() => onRemove(originalIndex)}
-                className="text-red-400 hover:text-red-600 text-xs shrink-0 mt-0.5"
+                className="btn-ghost-danger shrink-0"
                 aria-label="Remove entry"
               >
                 Remove

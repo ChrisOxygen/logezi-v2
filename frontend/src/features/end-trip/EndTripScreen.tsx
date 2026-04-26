@@ -13,7 +13,6 @@ export function EndTripScreen() {
   const [logMarkers, setLogMarkers] = useState<LogMarker[]>([])
 
   useEffect(() => {
-    // Collect all log entries, grouped by unique location string
     const locationMap = new Map<string, LogMarker['entries']>()
     endedTrip.days.forEach((day) => {
       day.entries.forEach((entry) => {
@@ -30,7 +29,6 @@ export function EndTripScreen() {
       })
     })
 
-    // Geocode each unique location in parallel, skip failures silently
     Promise.allSettled(
       Array.from(locationMap.entries()).map(([loc, entries]) =>
         geocodeAddress(loc).then((geo) => ({ geo, entries })),
@@ -71,45 +69,88 @@ export function EndTripScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="h-[40vh]">
+    <div className="min-h-screen pb-16" style={{ background: 'var(--col-bg)' }}>
+      {/* Map */}
+      <div className="h-[38vh]">
         <TripMap trip={endedTrip} logMarkers={logMarkers} />
       </div>
 
-      <div className="max-w-2xl mx-auto p-4 flex flex-col gap-6">
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Trip Complete</h2>
-          <p className="text-gray-500 text-sm mb-4">
-            {endedTrip.setup.current_location} &rarr; {endedTrip.setup.pickup} &rarr;{' '}
-            {endedTrip.setup.destination}
-          </p>
-          <div className="flex gap-6 text-sm">
-            <div>
-              <p className="text-gray-400">Total Miles</p>
-              <p className="font-bold text-lg">{Math.round(endedTrip.route.total_miles)}</p>
+      <div className="max-w-2xl mx-auto p-4 flex flex-col gap-5">
+
+        {/* Trip complete hero */}
+        <div className="card p-6 anim-fade-up">
+          {/* completion accent */}
+          <div className="flex items-center gap-2 mb-4">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: 'var(--col-green-pale)' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--col-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
             </div>
-            <div>
-              <p className="text-gray-400">Days Logged</p>
-              <p className="font-bold text-lg">{endedTrip.days.length}</p>
+            <span className="section-label" style={{ color: 'var(--col-green)' }}>Trip Complete</span>
+          </div>
+
+          <h2
+            className="font-display font-bold mb-1"
+            style={{ fontSize: '1.4rem', color: 'var(--col-text)' }}
+          >
+            {endedTrip.setup.pickup}
+            <span style={{ color: 'var(--col-text-3)', fontWeight: 500 }}> → </span>
+            {endedTrip.setup.destination}
+          </h2>
+          <p className="text-sm mb-5" style={{ color: 'var(--col-text-3)' }}>
+            From {endedTrip.setup.current_location}
+          </p>
+
+          <div
+            className="flex gap-8 pt-4"
+            style={{ borderTop: '1px solid var(--col-border-2)' }}
+          >
+            <div className="stat-tile">
+              <span className="stat-tile-label">Total Miles</span>
+              <span className="stat-tile-value">{Math.round(endedTrip.route.total_miles)}</span>
+            </div>
+            <div className="stat-tile">
+              <span className="stat-tile-label">Days Logged</span>
+              <span className="stat-tile-value">{endedTrip.days.length}</span>
             </div>
           </div>
         </div>
 
-        {endedTrip.days.map((day) => (
-          <div key={day.day_number} className="bg-white rounded-xl shadow p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">
-              Day {day.day_number} — {day.date}
-            </h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
+        {/* Per-day summary */}
+        {endedTrip.days.map((day, idx) => (
+          <div
+            key={day.day_number}
+            className="card p-5 anim-fade-up"
+            style={{ animationDelay: `${(idx + 1) * 60}ms` }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="section-title">Day {day.day_number}</span>
+              <span
+                className="font-mono text-xs"
+                style={{ color: 'var(--col-text-3)', fontFamily: 'JetBrains Mono, monospace' }}
+              >
+                {day.date}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2">
               {[
-                { label: 'Driver', value: day.driver_name },
+                { label: 'Driver',  value: day.driver_name },
                 { label: 'Tractor', value: day.tractor },
-                { label: 'Miles', value: String(day.total_miles) },
+                { label: 'Miles',   value: String(day.total_miles) },
                 { label: 'Entries', value: String(day.entries.length) },
               ].map(({ label, value }) => (
-                <div key={label}>
-                  <span className="text-gray-400">{label}: </span>
-                  <span className="font-medium">{value || '—'}</span>
+                <div key={label} className="flex justify-between items-baseline">
+                  <span className="text-xs" style={{ color: 'var(--col-text-3)' }}>{label}</span>
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: value ? 'var(--col-text)' : 'var(--col-text-3)' }}
+                  >
+                    {value || '—'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -117,26 +158,40 @@ export function EndTripScreen() {
         ))}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
-            {error}
+          <div className="alert alert-error anim-slide-down">
+            <span>⚠</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <div className="flex flex-col gap-3">
+        {/* Actions */}
+        <div className="flex flex-col gap-3 anim-fade-up delay-5">
           <button
             onClick={handleDownloadPDF}
             disabled={downloading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn btn-amber"
           >
-            {downloading ? 'Generating PDF...' : 'Download Log Sheets (PDF)'}
+            {downloading ? (
+              <>
+                <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+                Generating PDF…
+              </>
+            ) : (
+              <>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Log Sheets (PDF)
+              </>
+            )}
           </button>
-          <button
-            onClick={handleStartNew}
-            className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-          >
+          <button className="btn btn-outline" onClick={handleStartNew}>
             Start New Trip
           </button>
         </div>
+
       </div>
     </div>
   )
