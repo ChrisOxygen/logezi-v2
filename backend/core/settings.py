@@ -132,11 +132,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'hos_logger.log',
-            'formatter': 'verbose',
-        },
     },
     'loggers': {
         'django': {
@@ -144,19 +139,19 @@ LOGGING = {
             'level': 'WARNING',
         },
         'core': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
         'maps': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
         'trips': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
         'logs': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
     },
