@@ -8,6 +8,8 @@ import { EndTripScreen } from '@/features/end-trip/EndTripScreen'
 
 function ActiveTripRoute({ children }: { children: React.ReactNode }) {
   const trip = useTripStore((s) => s.trip)
+  const endedTrip = useTripStore((s) => s.endedTrip)
+  if (!trip && endedTrip) return <Navigate to="/end-trip" replace />
   if (!trip) return <Navigate to="/" replace />
   return <>{children}</>
 }

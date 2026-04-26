@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTripStore } from '@/shared/store/tripStore'
-import { generateLogPDF, isApiError } from '@/shared/api/client'
-import { TripMap } from '@/features/map/TripMap'
+import { generateLogPDF, geocodeAddress, isApiError } from '@/shared/api/client'
+import { TripMap, type LogMarker } from '@/features/map/TripMap'
 
 export function EndTripScreen() {
   const navigate = useNavigate()
@@ -10,6 +10,42 @@ export function EndTripScreen() {
   const abandonTrip = useTripStore((s) => s.abandonTrip)
   const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [logMarkers, setLogMarkers] = useState<LogMarker[]>([])
+
+  useEffect(() => {
+    // Collect all log entries, grouped by unique location string
+    const locationMap = new Map<string, LogMarker['entries']>()
+    endedTrip.days.forEach((day) => {
+      day.entries.forEach((entry) => {
+        const loc = entry.location.trim()
+        if (!loc) return
+        if (!locationMap.has(loc)) locationMap.set(loc, [])
+        locationMap.get(loc)!.push({
+          day: day.day_number,
+          time: entry.time,
+          status: entry.status,
+          location: loc,
+          remarks: entry.remarks,
+        })
+      })
+    })
+
+    // Geocode each unique location in parallel, skip failures silently
+    Promise.allSettled(
+      Array.from(locationMap.entries()).map(([loc, entries]) =>
+        geocodeAddress(loc).then((geo) => ({ geo, entries })),
+      ),
+    ).then((results) => {
+      const markers: LogMarker[] = []
+      results.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          const { geo, entries } = result.value
+          markers.push({ lat: geo.lat, lng: geo.lng, entries })
+        }
+      })
+      setLogMarkers(markers)
+    })
+  }, [endedTrip])
 
   const handleDownloadPDF = async () => {
     setDownloading(true)
@@ -37,7 +73,7 @@ export function EndTripScreen() {
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       <div className="h-[40vh]">
-        <TripMap trip={endedTrip} />
+        <TripMap trip={endedTrip} logMarkers={logMarkers} />
       </div>
 
       <div className="max-w-2xl mx-auto p-4 flex flex-col gap-6">

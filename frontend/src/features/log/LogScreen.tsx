@@ -183,7 +183,7 @@ export function LogScreen() {
             Save Day {currentDay.day_number} &amp; Add Day {currentDay.day_number + 1}
           </button>
           <button
-            onClick={() => { endTrip(); navigate('/end-trip') }}
+            onClick={() => endTrip()}
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
             End Trip &amp; Generate PDF

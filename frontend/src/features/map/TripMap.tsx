@@ -1,7 +1,20 @@
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import type { ActiveTrip } from '@/shared/types'
+import type { ActiveTrip, DutyStatus } from '@/shared/types'
+import { DUTY_STATUS_LABELS } from '@/shared/types'
+
+export interface LogMarker {
+  lat: number
+  lng: number
+  entries: Array<{
+    day: number
+    time: string
+    status: DutyStatus
+    location: string
+    remarks: string
+  }>
+}
 
 // Fix default marker icon broken by Vite bundling
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)['_getIconUrl']
@@ -24,9 +37,10 @@ const colorIcon = (color: string) =>
 
 interface TripMapProps {
   trip: ActiveTrip
+  logMarkers?: LogMarker[]
 }
 
-export function TripMap({ trip }: TripMapProps) {
+export function TripMap({ trip, logMarkers = [] }: TripMapProps) {
   const { locations, route } = trip
 
   const routePositions: [number, number][] = route.geometry.coordinates.map(
@@ -66,6 +80,23 @@ export function TripMap({ trip }: TripMapProps) {
       >
         <Popup>Destination: {locations.destination.display_name}</Popup>
       </Marker>
+
+      {logMarkers.map((marker, i) => (
+        <Marker key={i} position={[marker.lat, marker.lng]} icon={colorIcon('blue')}>
+          <Popup>
+            <div style={{ minWidth: 180 }}>
+              <strong style={{ display: 'block', marginBottom: 6 }}>{marker.entries[0].location}</strong>
+              {marker.entries.map((e, j) => (
+                <div key={j} style={{ marginBottom: 4, paddingBottom: 4, borderBottom: j < marker.entries.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                  <div style={{ fontWeight: 600, fontSize: 12 }}>Day {e.day} · {e.time}</div>
+                  <div style={{ fontSize: 12 }}>{DUTY_STATUS_LABELS[e.status]}</div>
+                  {e.remarks && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{e.remarks}</div>}
+                </div>
+              ))}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   )
 }
