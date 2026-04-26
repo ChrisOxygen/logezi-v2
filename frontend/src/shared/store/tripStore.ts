@@ -2,15 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ActiveTrip, DayLog, LogEntry, PostTrip } from '@/shared/types'
 
-const INITIAL_ENTRY: LogEntry = {
-  time: '00:00',
-  status: 'OFF_DUTY',
-  location: '',
-  remarks: '',
-  bracket: false,
-}
-
-const emptyDay = (day_number: number, date: string): DayLog => ({
+const emptyDay = (day_number: number, date: string, startLocation: string): DayLog => ({
   day_number,
   date,
   driver_name: '',
@@ -23,7 +15,13 @@ const emptyDay = (day_number: number, date: string): DayLog => ({
   commodity: '',
   load_number: '',
   total_miles: 0,
-  entries: [{ ...INITIAL_ENTRY }],
+  entries: [{
+    time: '00:00',
+    status: 'OFF_DUTY',
+    location: startLocation,
+    remarks: '',
+    bracket: false,
+  }],
   post_trip: { defects: 'none' },
   completed: false,
 })
@@ -74,11 +72,14 @@ export const useTripStore = create<TripStore>()(
         const nextNum = trip.days.length + 1
         const date = new Date()
         date.setDate(date.getDate() + nextNum - 1)
+        const prevDay = trip.days.find((d) => d.day_number === trip.current_day)
+        const prevEntries = prevDay?.entries ?? []
+        const lastLocation = prevEntries.length > 0 ? prevEntries[prevEntries.length - 1].location : ''
         set({
           trip: {
             ...trip,
             current_day: nextNum,
-            days: [...trip.days, emptyDay(nextNum, date.toISOString().split('T')[0])],
+            days: [...trip.days, emptyDay(nextNum, date.toISOString().split('T')[0], lastLocation)],
           },
         })
       },
