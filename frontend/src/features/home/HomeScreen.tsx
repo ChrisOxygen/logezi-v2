@@ -189,7 +189,7 @@ export function HomeScreen() {
           )}
 
           <div className="flex flex-col gap-4 mt-4">
-            <div className="anim-fade-up delay-2">
+            <div className="anim-fade-up delay-2" style={{ position: 'relative', zIndex: 3 }}>
               <LocationAutocomplete
                 label="Current Location"
                 placeholder="e.g. Dallas, TX"
@@ -199,7 +199,7 @@ export function HomeScreen() {
               />
             </div>
 
-            <div className="anim-fade-up delay-3">
+            <div className="anim-fade-up delay-3" style={{ position: 'relative', zIndex: 2 }}>
               <LocationAutocomplete
                 label="Pickup Location"
                 placeholder="e.g. Shreveport, LA"
@@ -209,7 +209,7 @@ export function HomeScreen() {
               />
             </div>
 
-            <div className="anim-fade-up delay-4">
+            <div className="anim-fade-up delay-4" style={{ position: 'relative', zIndex: 1 }}>
               <LocationAutocomplete
                 label="Destination"
                 placeholder="e.g. Atlanta, GA"
