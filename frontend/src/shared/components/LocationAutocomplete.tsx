@@ -10,14 +10,39 @@ interface Props {
   labelClassName?: string
 }
 
+interface DropdownPos {
+  top: number
+  left: number
+  width: number
+}
+
 export function LocationAutocomplete({ label, placeholder, value, onChange, error }: Props) {
   const [suggestions, setSuggestions] = useState<NominatimResult[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [highlighted, setHighlighted] = useState(-1)
+  const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputWrapRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const calcPos = useCallback(() => {
+    if (!inputWrapRef.current) return
+    const rect = inputWrapRef.current.getBoundingClientRect()
+    setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width })
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    calcPos()
+    window.addEventListener('scroll', calcPos, true)
+    window.addEventListener('resize', calcPos)
+    return () => {
+      window.removeEventListener('scroll', calcPos, true)
+      window.removeEventListener('resize', calcPos)
+    }
+  }, [open, calcPos])
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
@@ -83,10 +108,10 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
   }
 
   return (
-    <div ref={containerRef} className="relative" style={{ zIndex: open ? 20 : 'auto' }}>
+    <div ref={containerRef}>
       <label className="field-label">{label}</label>
 
-      <div className="relative">
+      <div ref={inputWrapRef} className="relative">
         <input
           type="text"
           placeholder={placeholder}
@@ -112,10 +137,15 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
         <p className="text-xs mt-1" style={{ color: 'var(--col-red)' }}>{error}</p>
       )}
 
-      {open && suggestions.length > 0 && (
+      {open && suggestions.length > 0 && dropdownPos && (
         <ul
-          className="absolute z-50 mt-1 w-full rounded-xl overflow-hidden anim-slide-down"
+          className="rounded-xl overflow-hidden anim-slide-down"
           style={{
+            position: 'fixed',
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            width: dropdownPos.width,
+            zIndex: 9999,
             background: '#ffffff',
             border: '1px solid var(--col-border)',
             boxShadow: '0 8px 24px rgba(13,27,46,.15)',
