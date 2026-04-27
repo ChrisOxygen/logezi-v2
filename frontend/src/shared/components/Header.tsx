@@ -14,20 +14,12 @@ export function Header() {
       style={{ background: 'var(--col-navy)', borderBottom: '1px solid rgba(255,255,255,.07)' }}
     >
       <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          {/* Truck glyph */}
-          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-            <rect x="0" y="3" width="12" height="8" rx="1.5" fill="var(--col-amber)" opacity=".9"/>
-            <path d="M12 5h4l2 3v3h-6V5z" fill="var(--col-amber)"/>
-            <circle cx="3.5" cy="12" r="2" fill="var(--col-navy)" stroke="var(--col-amber)" strokeWidth="1.2"/>
-            <circle cx="14.5" cy="12" r="2" fill="var(--col-navy)" stroke="var(--col-amber)" strokeWidth="1.2"/>
-          </svg>
-          <span
-            className="font-display font-extrabold tracking-widest text-sm uppercase"
-            style={{ color: 'var(--col-amber)', letterSpacing: '0.12em' }}
-          >
-            HOS Logger
-          </span>
+        <Link to="/" className="flex items-center group">
+          <img
+            src="/brand/logezi-logo-white.webp"
+            alt="logEzi"
+            className="h-7 w-auto"
+          />
         </Link>
 
         <nav className="flex gap-1">

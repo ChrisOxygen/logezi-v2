@@ -253,13 +253,15 @@ export function HomeScreen() {
               ) : 'Start Trip'}
             </button>
 
-            <button
-              onClick={handleLoadTestData}
-              className="btn btn-outline anim-fade-up delay-5"
-              style={{ fontSize: '0.82rem', opacity: 0.7 }}
-            >
-              Load Test Data (Dev)
-            </button>
+            {import.meta.env.DEV && (
+              <button
+                onClick={handleLoadTestData}
+                className="btn btn-outline anim-fade-up delay-5"
+                style={{ fontSize: '0.82rem', opacity: 0.7 }}
+              >
+                Load Test Data (Dev)
+              </button>
+            )}
           </div>
         </div>
 
