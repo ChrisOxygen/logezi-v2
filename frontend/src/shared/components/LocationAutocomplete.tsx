@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { searchLocations, type NominatimResult } from '@/shared/api/nominatim'
 
 interface Props {
@@ -137,7 +138,7 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
         <p className="text-xs mt-1" style={{ color: 'var(--col-red)' }}>{error}</p>
       )}
 
-      {open && suggestions.length > 0 && dropdownPos && (
+      {open && suggestions.length > 0 && dropdownPos && createPortal(
         <ul
           className="rounded-xl overflow-hidden anim-slide-down"
           style={{
@@ -168,7 +169,8 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
               {result.display_name}
             </li>
           ))}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   )
