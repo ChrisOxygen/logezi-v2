@@ -119,12 +119,3 @@ export function calculateTotals(entries: LogEntry[]): Promise<DayTotals> {
     body: JSON.stringify({ entries }),
   })
 }
-
-// ─── Logs ─────────────────────────────────────────────────────────────────────
-
-export function generateLogPDF(days: DayLog[]): Promise<Blob> {
-  return request<Blob>('/logs/generate/', {
-    method: 'POST',
-    body: JSON.stringify({ days }),
-  })
-}
