@@ -83,7 +83,7 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" style={{ zIndex: open ? 20 : 'auto' }}>
       <label className="field-label">{label}</label>
 
       <div className="relative">
@@ -116,9 +116,9 @@ export function LocationAutocomplete({ label, placeholder, value, onChange, erro
         <ul
           className="absolute z-50 mt-1 w-full rounded-xl overflow-hidden anim-slide-down"
           style={{
-            background: 'var(--col-surface)',
+            background: '#ffffff',
             border: '1px solid var(--col-border)',
-            boxShadow: '0 8px 24px rgba(27,42,59,.12)',
+            boxShadow: '0 8px 24px rgba(13,27,46,.15)',
             maxHeight: '14rem',
             overflowY: 'auto',
           }}
