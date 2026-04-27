@@ -3,7 +3,6 @@ import type {
   ActiveTrip,
   GeoLocation,
   Route,
-  DayLog,
   DayTotals,
   ValidationResult,
   LogEntry,
