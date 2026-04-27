@@ -16,10 +16,10 @@ NUM_ROWS = 4
 GRID_BOTTOM = GRID_TOP - (NUM_ROWS * ROW_HEIGHT)
 
 ROW_TOPS = {
-    'OFF_DUTY':      GRID_TOP,
-    'SLEEPER_BERTH': GRID_TOP - ROW_HEIGHT,
-    'DRIVING':       GRID_TOP - (2 * ROW_HEIGHT),
-    'ON_DUTY':       GRID_TOP - (3 * ROW_HEIGHT),
+    'OFF_DUTY':             GRID_TOP,
+    'SLEEPER_BERTH':        GRID_TOP - ROW_HEIGHT,
+    'DRIVING':              GRID_TOP - (2 * ROW_HEIGHT),
+    'ON_DUTY_NOT_DRIVING':  GRID_TOP - (3 * ROW_HEIGHT),
 }
 
 HOUR_WIDTH = GRID_WIDTH / 24
@@ -81,7 +81,7 @@ def _draw_grid(c: canvas.Canvas):
         ('1. OFF DUTY', 'OFF_DUTY'),
         ('2. SLEEPER BERTH', 'SLEEPER_BERTH'),
         ('3. DRIVING', 'DRIVING'),
-        ('4. ON DUTY (NOT DRIVING)', 'ON_DUTY'),
+        ('4. ON DUTY (NOT DRIVING)', 'ON_DUTY_NOT_DRIVING'),
     ]
     c.setFont('Helvetica-Bold', 6)
     c.setFillColor(DOT_BLUE)
@@ -170,6 +170,7 @@ def _draw_header(c: canvas.Canvas, day_data: dict):
                  f"Load No.: {day_data.get('load_number', '')}")
 
     c.drawString(0.5 * inch, PAGE_HEIGHT - 3.0 * inch,
+                 f"Carrier: {day_data.get('carrier_name', '')}    "
                  f"Home Terminal: {day_data.get('home_terminal', '')}")
 
     c.drawString(0.5 * inch, PAGE_HEIGHT - 3.3 * inch,

@@ -8,6 +8,7 @@ const emptyDay = (day_number: number, date: string, startLocation: string): DayL
   driver_name: '',
   driver_number: '',
   co_driver: 'N/A',
+  carrier_name: '',
   home_terminal: '',
   tractor: '',
   trailer: '',
@@ -34,6 +35,7 @@ interface TripStore {
   startTrip: (trip: ActiveTrip) => void
   endTrip: () => void
   abandonTrip: () => void
+  seedTestData: (trip: ActiveTrip) => void
 
   // Day management
   addDay: () => void
@@ -66,6 +68,9 @@ export const useTripStore = create<TripStore>()(
       // Clears everything — used by "Abandon" and "Start New" on EndTripScreen
       abandonTrip: () => set({ trip: null, endedTrip: null }),
 
+      // Sets a pre-built trip directly as endedTrip for dev/testing
+      seedTestData: (trip) => set({ trip: null, endedTrip: trip }),
+
       addDay: () => {
         const { trip } = get()
         if (!trip) return
@@ -80,6 +85,7 @@ export const useTripStore = create<TripStore>()(
           newDay.driver_name = prevDay.driver_name
           newDay.driver_number = prevDay.driver_number
           newDay.co_driver = prevDay.co_driver
+          newDay.carrier_name = prevDay.carrier_name
           newDay.home_terminal = prevDay.home_terminal
           newDay.tractor = prevDay.tractor
           newDay.trailer = prevDay.trailer

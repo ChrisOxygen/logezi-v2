@@ -11,6 +11,7 @@ import { HOSCounter } from './HOSCounter'
 const DAY_FIELDS = [
   { key: 'driver_name',   label: 'Driver Name' },
   { key: 'driver_number', label: 'Driver Number' },
+  { key: 'carrier_name',  label: 'Carrier Name',      wide: true },
   { key: 'tractor',       label: 'Tractor No.' },
   { key: 'trailer',       label: 'Trailer No.' },
   { key: 'shipper',       label: 'Shipper',           wide: true },

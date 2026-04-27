@@ -17,6 +17,7 @@ class DayLogSerializer(serializers.Serializer):
     driver_name = serializers.CharField(max_length=200)
     driver_number = serializers.CharField(max_length=50, required=False, default='')
     co_driver = serializers.CharField(max_length=200, required=False, default='N/A')
+    carrier_name = serializers.CharField(max_length=300, required=False, default='')
     home_terminal = serializers.CharField(max_length=300, required=False, default='')
     tractor = serializers.CharField(max_length=100)
     trailer = serializers.CharField(max_length=100)

@@ -4,6 +4,7 @@ import { useTripStore } from '@/shared/store/tripStore'
 import { getRoute, isApiError } from '@/shared/api/client'
 import { LocationAutocomplete } from '@/shared/components/LocationAutocomplete'
 import type { ActiveTrip } from '@/shared/types'
+import { TEST_TRIP } from '@/shared/utils/testData'
 
 interface Form {
   current_location: string
@@ -14,7 +15,7 @@ interface Form {
 
 export function HomeScreen() {
   const navigate = useNavigate()
-  const { trip, startTrip, abandonTrip } = useTripStore()
+  const { trip, startTrip, abandonTrip, seedTestData } = useTripStore()
 
   const [form, setForm] = useState<Form>({
     current_location: '',
@@ -25,6 +26,11 @@ export function HomeScreen() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const handleLoadTestData = () => {
+    seedTestData(TEST_TRIP)
+    navigate('/end-trip')
+  }
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -52,6 +58,7 @@ export function HomeScreen() {
             driver_name: '',
             driver_number: '',
             co_driver: 'N/A',
+            carrier_name: '',
             home_terminal: '',
             tractor: '',
             trailer: '',
@@ -244,6 +251,14 @@ export function HomeScreen() {
                   Getting Route…
                 </>
               ) : 'Start Trip'}
+            </button>
+
+            <button
+              onClick={handleLoadTestData}
+              className="btn btn-outline anim-fade-up delay-5"
+              style={{ fontSize: '0.82rem', opacity: 0.7 }}
+            >
+              Load Test Data (Dev)
             </button>
           </div>
         </div>

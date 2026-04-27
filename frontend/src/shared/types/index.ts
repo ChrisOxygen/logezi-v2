@@ -3,20 +3,20 @@ export type DutyStatus =
   | 'OFF_DUTY'
   | 'SLEEPER_BERTH'
   | 'DRIVING'
-  | 'ON_DUTY'
+  | 'ON_DUTY_NOT_DRIVING'
 
 export const DUTY_STATUS_LABELS: Record<DutyStatus, string> = {
   OFF_DUTY: '1. Off Duty',
   SLEEPER_BERTH: '2. Sleeper Berth',
   DRIVING: '3. Driving',
-  ON_DUTY: '4. On Duty (Not Driving)',
+  ON_DUTY_NOT_DRIVING: '4. On Duty (Not Driving)',
 }
 
 export const DUTY_STATUS_COLORS: Record<DutyStatus, string> = {
   OFF_DUTY: '#6b7280',
   SLEEPER_BERTH: '#3b82f6',
   DRIVING: '#ef4444',
-  ON_DUTY: '#f59e0b',
+  ON_DUTY_NOT_DRIVING: '#f59e0b',
 }
 
 // ─── Log Entry ────────────────────────────────────────────────────────────────
@@ -40,6 +40,7 @@ export interface DayLog {
   driver_name: string
   driver_number: string
   co_driver: string
+  carrier_name: string
   home_terminal: string
   tractor: string
   trailer: string
@@ -140,4 +141,60 @@ export interface ValidationResult {
     total_on_duty_cycle: number
     cycle_remaining: number
   }
+}
+
+// ─── Driver's Daily Log (DriversDailyLog) ─────────────────────────────────────
+
+export interface DutySegment {
+  /** Start time in fractional hours e.g. 6.5 = 06:30 */
+  startHour: number
+  /** End time in fractional hours e.g. 14.25 = 14:15 */
+  endHour: number
+  status: DutyStatus
+}
+
+export interface RemarkEntry {
+  /** Position on timeline in fractional hours e.g. 11.5 = 11:30 */
+  timeHour: number
+  location: string
+  activity: string
+}
+
+export interface HoursSummary {
+  offDuty: number
+  sleeperBerth: number
+  driving: number
+  onDutyNotDriving: number
+}
+
+export interface DDLDate {
+  month: number
+  day: number
+  year: number
+}
+
+export interface DDLHeader {
+  date: DDLDate
+  totalMilesDrivingToday: number
+  carrierName: string
+  mainOfficeAddress: string
+  driverSignature: string
+  coDriverName: string | null
+  tractor: string
+  trailer: string
+}
+
+export interface DDLFooter {
+  shippingNumber: string
+  shipper: string
+  commodity: string
+  loadNumber: string
+}
+
+export interface DriversDailyLog {
+  header: DDLHeader
+  dutySegments: DutySegment[]
+  hoursSummary: HoursSummary
+  remarks: RemarkEntry[]
+  footer: DDLFooter
 }

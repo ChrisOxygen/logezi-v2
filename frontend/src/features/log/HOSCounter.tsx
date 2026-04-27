@@ -8,7 +8,7 @@ export function HOSCounter() {
   if (!trip || !currentDay) return null
 
   const drivingToday = hoursInStatus(currentDay.entries, 'DRIVING')
-  const onDutyToday  = drivingToday + hoursInStatus(currentDay.entries, 'ON_DUTY')
+  const onDutyToday  = drivingToday + hoursInStatus(currentDay.entries, 'ON_DUTY_NOT_DRIVING')
   const totalCycle   = Math.min(trip.setup.cycle_hours_used + onDutyToday, 70)
   const remaining    = Math.max(70 - totalCycle, 0)
   const pct          = Math.min((totalCycle / 70) * 100, 100)

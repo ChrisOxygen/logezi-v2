@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTripStore } from '@/shared/store/tripStore'
 import { generateLogPDF, geocodeAddress, isApiError } from '@/shared/api/client'
 import { TripMap, type LogMarker } from '@/features/map/TripMap'
+import { DailyLogSheet } from './DailyLogSheet'
+import { buildDriversDailyLog } from '@/shared/utils/buildDailyLog'
 
 export function EndTripScreen() {
   const navigate = useNavigate()
@@ -119,41 +121,14 @@ export function EndTripScreen() {
           </div>
         </div>
 
-        {/* Per-day summary */}
+        {/* Per-day full log sheets */}
         {endedTrip.days.map((day, idx) => (
           <div
             key={day.day_number}
-            className="card p-5 anim-fade-up"
+            className="anim-fade-up"
             style={{ animationDelay: `${(idx + 1) * 60}ms` }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="section-title">Day {day.day_number}</span>
-              <span
-                className="font-mono text-xs"
-                style={{ color: 'var(--col-text-3)', fontFamily: 'JetBrains Mono, monospace' }}
-              >
-                {day.date}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-              {[
-                { label: 'Driver',  value: day.driver_name },
-                { label: 'Tractor', value: day.tractor },
-                { label: 'Miles',   value: String(day.total_miles) },
-                { label: 'Entries', value: String(day.entries.length) },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-baseline">
-                  <span className="text-xs" style={{ color: 'var(--col-text-3)' }}>{label}</span>
-                  <span
-                    className="text-sm font-semibold"
-                    style={{ color: value ? 'var(--col-text)' : 'var(--col-text-3)' }}
-                  >
-                    {value || '—'}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <DailyLogSheet log={buildDriversDailyLog(day)} dayNumber={day.day_number} />
           </div>
         ))}
 

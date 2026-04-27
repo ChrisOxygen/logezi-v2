@@ -14,7 +14,7 @@ class LogEntrySerializer(serializers.Serializer):
         error_messages={
             'invalid_choice': (
                 'Invalid duty status. Must be one of: '
-                'OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY.'
+                'OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY_NOT_DRIVING.'
             )
         }
     )

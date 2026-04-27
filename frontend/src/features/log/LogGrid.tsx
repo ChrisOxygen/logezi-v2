@@ -10,7 +10,7 @@ const GRID_WIDTH = GRID_RIGHT - GRID_LEFT
 const GRID_TOP = 20
 const ROW_HEIGHT = 36
 
-const ROW_LABELS: DutyStatus[] = ['OFF_DUTY', 'SLEEPER_BERTH', 'DRIVING', 'ON_DUTY']
+const ROW_LABELS: DutyStatus[] = ['OFF_DUTY', 'SLEEPER_BERTH', 'DRIVING', 'ON_DUTY_NOT_DRIVING']
 const ROW_DISPLAY = ['1. Off Duty', '2. Sleeper', '3. Driving', '4. On Duty']
 
 function timeToX(time: string): number {
