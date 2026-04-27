@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTripStore } from '@/shared/store/tripStore'
-import { generateLogPDF, geocodeAddress, isApiError } from '@/shared/api/client'
+import { geocodeAddress, isApiError } from '@/shared/api/client'
 import { TripMap, type LogMarker } from '@/features/map/TripMap'
 import { DailyLogSheet } from './DailyLogSheet'
 import { buildDriversDailyLog } from '@/shared/utils/buildDailyLog'
+import { generateDOTPdf } from '@/shared/utils/generateDOTPdf'
 
 export function EndTripScreen() {
   const navigate = useNavigate()
@@ -47,17 +48,11 @@ export function EndTripScreen() {
     })
   }, [endedTrip])
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = () => {
     setDownloading(true)
     setError(null)
     try {
-      const blob = await generateLogPDF(endedTrip.days)
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'driver_log.pdf'
-      a.click()
-      URL.revokeObjectURL(url)
+      generateDOTPdf(endedTrip.days)
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Failed to generate PDF. Please try again.')
     } finally {
