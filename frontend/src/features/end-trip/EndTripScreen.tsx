@@ -52,7 +52,17 @@ export function EndTripScreen() {
     setDownloading(true)
     setError(null)
     try {
-      generateDOTPdf(endedTrip.days)
+      const driverName = endedTrip.days[0]?.driver_name ?? ''
+      const initials = driverName
+        .trim()
+        .split(/\s+/)
+        .map((w) => w[0]?.toUpperCase() ?? '')
+        .join('')
+      const from = endedTrip.locations.current.city.replace(/\s+/g, '-')
+      const to = endedTrip.locations.destination.city.replace(/\s+/g, '-')
+      const date = endedTrip.days[0]?.date ?? new Date().toISOString().slice(0, 10)
+      const filename = [initials, `${from}-to-${to}`, date].filter(Boolean).join('_') + '.pdf'
+      generateDOTPdf(endedTrip.days, filename)
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Failed to generate PDF. Please try again.')
     } finally {

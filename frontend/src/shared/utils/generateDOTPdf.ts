@@ -486,7 +486,7 @@ function drawPage(doc: jsPDF, day: DayLog): void {
 // ════════════════════════════════════════════════════════════════════════════
 //  PUBLIC ENTRY POINT
 // ════════════════════════════════════════════════════════════════════════════
-export function generateDOTPdf(days: DayLog[]): void {
+export function generateDOTPdf(days: DayLog[], filename: string): void {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' })
 
   days.forEach((day, i) => {
@@ -494,5 +494,5 @@ export function generateDOTPdf(days: DayLog[]): void {
     drawPage(doc, day)
   })
 
-  doc.save('driver_log.pdf')
+  doc.save(filename)
 }
